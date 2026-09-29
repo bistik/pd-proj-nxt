@@ -1,6 +1,8 @@
 import { InferSelectModel, relations } from "drizzle-orm";
 import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
 
+import { note } from "./notes-schema";
+
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -76,6 +78,7 @@ export const verification = pgTable(
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  notes: many(note),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
