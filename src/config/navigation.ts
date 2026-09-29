@@ -47,7 +47,7 @@ export const navigationConfig: NavigationConfig = {
       icon: SquareTerminal,
       isActive: true,
       items: [
-        { title: "History", url: "/playground/history" },
+        { title: "New note", url: "/notes/new" },
         { title: "Starred", url: "/playground/starred" },
         { title: "Settings", url: "/playground/settings" },
       ],

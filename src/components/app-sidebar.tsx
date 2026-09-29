@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { Command } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";

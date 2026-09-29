@@ -5,6 +5,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { requireAuth } from "@/lib/auth-guard";
+import { Toaster } from "@/components/ui/sonner";
 
 export default async function ProtectedLayout({
   children,
@@ -24,6 +25,7 @@ export default async function ProtectedLayout({
           <SidebarTrigger />
         </header>
         <main className="flex-1 p-6">{children}</main>
+        <Toaster position="top-center" />
       </SidebarInset>
     </SidebarProvider>
   );

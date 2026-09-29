@@ -1,12 +1,12 @@
 import { InferSelectModel, relations } from "drizzle-orm";
-import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
 
 import { user } from "./auth-schema";
 
-export const note = pgTable(
+export const notesTable = pgTable(
   "notes",
   {
-    id: text("id").primaryKey(),
+    id: integer().primaryKey().generatedByDefaultAsIdentity(),
     title: text("title").notNull(),
     content: text("content").notNull(),
     userId: text("user_id")
@@ -21,11 +21,11 @@ export const note = pgTable(
   (table) => [index("notes_userId_idx").on(table.userId)],
 );
 
-export const noteRelations = relations(note, ({ one }) => ({
+export const noteRelations = relations(notesTable, ({ one }) => ({
   user: one(user, {
-    fields: [note.userId],
+    fields: [notesTable.userId],
     references: [user.id],
   }),
 }));
 
-export type Note = InferSelectModel<typeof note>;
+export type Note = InferSelectModel<typeof notesTable>;
