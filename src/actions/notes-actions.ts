@@ -6,6 +6,7 @@ import { notesTable } from "@/lib/db/notes-schema";
 import { eq, and } from "drizzle-orm";
 import { Note } from "@/lib/db/notes-schema";
 import { notFound } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export type NoteData = { title: string; content: string };
 export type MutateNoteResult = { success: boolean; message: string };
@@ -82,5 +83,26 @@ export const updateNote = async (
   } catch (err) {
     console.error(`Error in updating note with id ${noteId}`, err);
     return { success: false, message: "Unable to update note" };
+  }
+};
+
+export const deleteNote = async (noteId: number): Promise<MutateNoteResult> => {
+  const session = await requireAuth();
+  const { user } = session;
+  try {
+    const deleted = await db
+      .delete(notesTable)
+      .where(and(eq(notesTable.id, noteId), eq(notesTable.userId, user.id)))
+      .returning({ deletedId: notesTable.id });
+
+    revalidatePath("/notes");
+
+    if (deleted.length === 0) {
+      return { success: false, message: "Note not found" };
+    }
+    return { success: true, message: "Note successfully deleted" };
+  } catch (err) {
+    console.error(`Error in deleting note ${noteId}`, err);
+    return { success: false, message: "Error in deleting note" };
   }
 };

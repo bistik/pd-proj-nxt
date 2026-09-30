@@ -20,7 +20,6 @@ import { authClient } from "@/lib/auth-client";
 import { User } from "@/lib/db/auth-schema";
 import {
   ChevronsUpDownIcon,
-  SparklesIcon,
   BadgeCheckIcon,
   CreditCardIcon,
   BellIcon,
