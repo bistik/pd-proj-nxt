@@ -8,14 +8,16 @@ import { Loader2 } from "lucide-react";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
-function NoteForm() {
+export default function NoteForm() {
   const {
     register,
     handleSubmit,
     reset,
     formState: { isSubmitting, errors },
   } = useForm();
+  const router = useRouter();
 
   const onSubmit = async (data: FieldValues) => {
     const result = await createNote({
@@ -24,7 +26,7 @@ function NoteForm() {
     });
     if (result.success) {
       toast.success("Note successfully created");
-      reset();
+      router.push("/notes");
     } else {
       toast.error(result.message);
     }
@@ -61,5 +63,3 @@ function NoteForm() {
     </form>
   );
 }
-
-export default NoteForm;

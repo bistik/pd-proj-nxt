@@ -48,7 +48,7 @@ export const navigationConfig: NavigationConfig = {
       isActive: true,
       items: [
         { title: "New note", url: "/notes/new" },
-        { title: "Starred", url: "/playground/starred" },
+        { title: "My notes", url: "/notes" },
         { title: "Settings", url: "/playground/settings" },
       ],
     },
