@@ -1,11 +1,8 @@
 import { getNotes } from "@/actions/notes-actions";
 import NoteList from "@/components/notes/note-list";
-import { requireAuth } from "@/lib/auth-guard";
 
 async function NotesPage() {
-  const session = await requireAuth();
-  const { user } = session;
-  const getNotesResult = await getNotes(user.id);
+  const getNotesResult = await getNotes();
 
   if (getNotesResult.success) {
     return <NoteList noteItems={getNotesResult.notes} />;
