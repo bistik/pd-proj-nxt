@@ -7,9 +7,14 @@ import { eq, and } from "drizzle-orm";
 import { Note } from "@/lib/db/notes-schema";
 import { notFound } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { noteSchema, NoteInput } from "@/lib/validations/note";
+import { z } from "zod";
 
-export type NoteData = { title: string; content: string };
-export type MutateNoteResult = { success: boolean; message: string };
+export type MutateNoteResult = {
+  success: boolean;
+  message: string;
+  errors?: Record<string, string[]>;
+};
 export type GetNotesResult =
   | { success: true; notes: Note[] }
   | { success: false; message: string };
@@ -17,10 +22,22 @@ export type ShowNoteResult =
   | { success: true; note: Note }
   | { success: false; message: string };
 
-export const createNote = async (data: NoteData): Promise<MutateNoteResult> => {
+export const createNote = async (
+  data: NoteInput,
+): Promise<MutateNoteResult> => {
   const session = await requireAuth();
   const { user } = session;
 
+  const result = noteSchema.safeParse(data);
+
+  if (!result.success) {
+    const { fieldErrors } = z.flattenError(result.error);
+    return {
+      success: false,
+      message: "there were validation errors",
+      errors: fieldErrors,
+    };
+  }
   try {
     await db.insert(notesTable).values({ ...data, userId: user.id });
     return { success: true, message: "Note successfully created" };
@@ -69,10 +86,21 @@ export const getNote = async (noteId: number): Promise<ShowNoteResult> => {
 
 export const updateNote = async (
   noteId: number,
-  data: NoteData,
+  data: NoteInput,
 ): Promise<MutateNoteResult> => {
   const session = await requireAuth();
   const { user } = session;
+
+  const result = noteSchema.safeParse(data);
+
+  if (!result.success) {
+    const { fieldErrors } = z.flattenError(result.error);
+    return {
+      success: false,
+      message: "there were validation errors",
+      errors: fieldErrors,
+    };
+  }
 
   try {
     await db

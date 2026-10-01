@@ -3,28 +3,29 @@
 import { useForm, FieldValues } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  createNote,
-  MutateNoteResult,
-  updateNote,
-} from "@/actions/notes-actions";
+import { createNote, updateNote } from "@/actions/notes-actions";
+import type { MutateNoteResult } from "@/actions/notes-actions";
 import { Loader2 } from "lucide-react";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Note } from "@/lib/db/notes-schema";
+import type { Note } from "@/lib/db/notes-schema";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { noteSchema } from "@/lib/validations/note";
 
 export default function NoteForm({ initialData }: { initialData?: Note }) {
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
+    setError,
   } = useForm({
     defaultValues: {
       title: initialData?.title ?? "",
       content: initialData?.content ?? "",
     },
+    resolver: zodResolver(noteSchema),
   });
   const router = useRouter();
 
@@ -41,9 +42,20 @@ export default function NoteForm({ initialData }: { initialData?: Note }) {
         content: data.content,
       });
     }
+
     if (result.success) {
       toast.success(result.message);
       router.push("/notes");
+    } else if (result.errors) {
+      if (result.errors.title?.length) {
+        setError("title", { type: "server", message: result.errors.title[0] });
+      }
+      if (result.errors.content?.length) {
+        setError("content", {
+          type: "server",
+          message: result.errors.content[0],
+        });
+      }
     } else {
       toast.error(result.message);
     }
@@ -56,22 +68,20 @@ export default function NoteForm({ initialData }: { initialData?: Note }) {
         <Input
           type="text"
           id="title"
-          {...register("title", { required: "Title is required" })}
+          aria-invalid={!!errors.title}
+          {...register("title")}
         />
-        {errors.title && (
-          <FieldError>{String(errors.title?.message)}</FieldError>
-        )}
+        {errors.title && <FieldError>{errors.title.message}</FieldError>}
       </Field>
       <Field>
         <FieldLabel htmlFor="content">Content</FieldLabel>
         <Textarea
           id="content"
           rows={10}
-          {...register("content", { required: "Content is required" })}
+          aria-invalid={!!errors.content}
+          {...register("content")}
         />
-        {errors.content && (
-          <FieldError>{String(errors.content?.message)}</FieldError>
-        )}
+        {errors.content && <FieldError>{errors.content.message}</FieldError>}
       </Field>
       <div className="flex gap-4">
         <Button type="submit" disabled={isSubmitting}>

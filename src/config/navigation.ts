@@ -45,11 +45,10 @@ export const navigationConfig: NavigationConfig = {
       title: "Notes",
       url: "/notes",
       icon: SquareTerminal,
-      isActive: true,
+      isActive: false,
       items: [
         { title: "New note", url: "/notes/new" },
         { title: "My notes", url: "/notes" },
-        { title: "Settings", url: "/playground/settings" },
       ],
     },
     {

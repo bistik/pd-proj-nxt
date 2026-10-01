@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Note } from "@/lib/db/notes-schema";
+import type { Note } from "@/lib/db/notes-schema";
 import Link from "next/link";
 import {
   DropdownMenu,
