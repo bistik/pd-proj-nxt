@@ -7,7 +7,7 @@ export const projectsTable = pgTable(
   {
     id: integer().primaryKey().generatedByDefaultAsIdentity(),
     name: text("name").notNull(),
-    description: text("description").notNull(),
+    description: text("description"),
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),

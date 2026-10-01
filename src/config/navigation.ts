@@ -1,11 +1,10 @@
 import {
-  SquareTerminal,
-  Settings2,
-  LifeBuoy,
   Send,
   Frame,
   PieChart,
   type LucideIcon,
+  FolderKanban,
+  Notebook,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -44,7 +43,7 @@ export const navigationConfig: NavigationConfig = {
     {
       title: "Notes",
       url: "/notes",
-      icon: SquareTerminal,
+      icon: Notebook,
       isActive: false,
       items: [
         { title: "New note", url: "/notes/new" },
@@ -52,19 +51,16 @@ export const navigationConfig: NavigationConfig = {
       ],
     },
     {
-      title: "Settings",
-      url: "/settings",
-      icon: Settings2,
+      title: "Projects",
+      url: "/projects",
+      icon: FolderKanban,
       items: [
-        { title: "General", url: "/settings/general" },
-        { title: "Team", url: "/settings/team" },
+        { title: "New project", url: "/projects/new" },
+        { title: "All projects", url: "/projects" },
       ],
     },
   ],
-  navSecondary: [
-    { title: "Support", url: "/support", icon: LifeBuoy },
-    { title: "Feedback", url: "/feedback", icon: Send },
-  ],
+  navSecondary: [{ title: "Feedback", url: "/feedback", icon: Send }],
   projects: [
     { name: "Project dashboard", url: "/projects/dashboard", icon: Frame },
     { name: "OCR project", url: "/projects/ocr", icon: PieChart },

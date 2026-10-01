@@ -53,7 +53,7 @@ export default function NoteList({ noteItems }: { noteItems: Note[] }) {
   return (
     <>
       <Table>
-        <TableCaption>Your notes</TableCaption>
+        <TableCaption>Table listing of notes</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Title</TableHead>

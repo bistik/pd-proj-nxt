@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { createNote, updateNote } from "@/actions/notes-actions";
@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import type { Note } from "@/lib/db/notes-schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { noteSchema } from "@/lib/validations/note";
+import type { NoteInput } from "@/lib/validations/note";
 
 export default function NoteForm({ initialData }: { initialData?: Note }) {
   const {
@@ -29,18 +30,12 @@ export default function NoteForm({ initialData }: { initialData?: Note }) {
   });
   const router = useRouter();
 
-  const onSubmit = async (data: FieldValues) => {
+  const onSubmit = async (data: NoteInput) => {
     let result: MutateNoteResult;
     if (initialData?.id != null) {
-      result = await updateNote(initialData.id, {
-        title: data.title,
-        content: data.content,
-      });
+      result = await updateNote(initialData.id, data);
     } else {
-      result = await createNote({
-        title: data.title,
-        content: data.content,
-      });
+      result = await createNote(data);
     }
 
     if (result.success) {
