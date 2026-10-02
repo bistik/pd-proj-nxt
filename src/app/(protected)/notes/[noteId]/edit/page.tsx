@@ -12,14 +12,11 @@ export default async function EditNotePage({
   const id = Number(noteId);
   if (!Number.isInteger(id)) notFound();
 
-  const noteResult = await getNote(id);
-  if (noteResult.success) {
-    return (
-      <>
-        <h1 className="text-2xl font-bold">Edit Note</h1>
-        <NoteForm initialData={noteResult.note} />
-      </>
-    );
-  }
-  return <div>{noteResult.message}</div>;
+  const note = await getNote(id);
+  return (
+    <>
+      <h1 className="text-2xl font-bold">Edit Note</h1>
+      <NoteForm initialData={note} />
+    </>
+  );
 }

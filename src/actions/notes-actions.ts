@@ -18,9 +18,6 @@ export type MutateNoteResult = {
 export type GetNotesResult =
   | { success: true; notes: Note[] }
   | { success: false; message: string };
-export type ShowNoteResult =
-  | { success: true; note: Note }
-  | { success: false; message: string };
 
 export const createNote = async (
   data: NoteInput,
@@ -63,23 +60,19 @@ export const getNotes = async (): Promise<GetNotesResult> => {
   }
 };
 
-export const getNote = async (noteId: number): Promise<ShowNoteResult> => {
+export const getNote = async (noteId: number): Promise<Note> => {
   const session = await requireAuth();
   const { user } = session;
+  let note: Note | undefined;
   try {
-    const result = await db.query.notesTable.findFirst({
+    note = await db.query.notesTable.findFirst({
       where: (notesTable, { and, eq }) =>
         and(eq(notesTable.id, noteId), eq(notesTable.userId, user.id)),
     });
-    if (result) {
-      return { success: true, note: result };
-    }
+    if (note) return note;
   } catch (err) {
     console.error("Fetching a single note failed", err);
-    return {
-      success: false,
-      message: `Error fetching note with id: ${noteId}`,
-    };
+    throw err;
   }
   notFound();
 };

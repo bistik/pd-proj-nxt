@@ -11,20 +11,17 @@ export default async function ShowNotePage({
   const id = Number(noteId);
   if (!Number.isInteger(id)) notFound();
 
-  const noteResult = await getNote(id);
-  if (noteResult.success) {
-    return (
-      <div className="space-y-4">
-        <h2 className="text-3xl">{noteResult.note.title}</h2>
-        <p className="text-lg">{noteResult.note.content}</p>
-        <Link
-          href={`/notes/${noteResult.note.id}/edit`}
-          className="underline text-blue-600 hover:text-blue-800"
-        >
-          Edit this note
-        </Link>
-      </div>
-    );
-  }
-  return <div>{noteResult.message}</div>;
+  const note = await getNote(id);
+  return (
+    <div className="space-y-4">
+      <h2 className="text-3xl">{note.title}</h2>
+      <p className="text-lg">{note.content}</p>
+      <Link
+        href={`/notes/${note.id}/edit`}
+        className="underline text-blue-600 hover:text-blue-800"
+      >
+        Edit this note
+      </Link>
+    </div>
+  );
 }

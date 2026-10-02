@@ -6,6 +6,7 @@ import { projectsTable, type Project } from "@/lib/db/projects-schema";
 import { ProjectInput, projectSchema } from "@/lib/validations/project";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { notFound } from "next/navigation";
 import z from "zod";
 
 export const getProjects = async (): Promise<GetProjectsResults> => {
@@ -71,6 +72,23 @@ export const deleteProject = async (
     console.error(`Error deleting project with id ${projectId}`, err);
     return { success: false, message: "Unable to delete the project" };
   }
+};
+
+export const getProject = async (projectId: number): Promise<Project> => {
+  const session = await requireAuth();
+  const { user } = session;
+  let project: Project | undefined;
+  try {
+    project = await db.query.projectsTable.findFirst({
+      where: (projectsTable, { and, eq }) =>
+        and(eq(projectsTable.id, projectId), eq(projectsTable.userId, user.id)),
+    });
+    if (project) return project;
+  } catch (err) {
+    console.error(`Error fetching project with id ${projectId}`, err);
+    throw err;
+  }
+  notFound();
 };
 
 export type GetProjectsResults =

@@ -31,6 +31,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useTransition } from "react";
 import { deleteProject } from "@/actions/projects-actions";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function ProjectList({
   projectItems,
@@ -66,7 +67,14 @@ export default function ProjectList({
         <TableBody>
           {projectItems.map((project) => (
             <TableRow key={project.id}>
-              <TableCell>{project.name}</TableCell>
+              <TableCell>
+                <Link
+                  href={`/projects/${project.id}`}
+                  className="underline text-blue-600 hover:text-blue-800 hover:cursor-pointer"
+                >
+                  {project.name}
+                </Link>
+              </TableCell>
               <TableCell>{project.description}</TableCell>
               <TableCell>
                 <DropdownMenu>

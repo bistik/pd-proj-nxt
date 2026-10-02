@@ -65,9 +65,9 @@ export default function ProjectForm({
         {errors.name && <FieldError>{errors.name.message}</FieldError>}
       </Field>
       <Field>
-        <FieldLabel htmlFor="content">Description</FieldLabel>
+        <FieldLabel htmlFor="description">Description</FieldLabel>
         <Textarea
-          id="content"
+          id="description"
           rows={10}
           aria-invalid={!!errors.description}
           {...register("description")}
