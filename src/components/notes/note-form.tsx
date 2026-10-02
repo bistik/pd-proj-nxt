@@ -32,7 +32,7 @@ export default function NoteForm({ initialData }: { initialData?: Note }) {
 
   const onSubmit = async (data: NoteInput) => {
     let result: MutateNoteResult;
-    if (initialData?.id != null) {
+    if (initialData) {
       result = await updateNote(initialData.id, data);
     } else {
       result = await createNote(data);

@@ -91,6 +91,37 @@ export const getProject = async (projectId: number): Promise<Project> => {
   notFound();
 };
 
+export const updateProject = async (
+  projectId: number,
+  data: ProjectInput,
+): Promise<MutateProjectResult> => {
+  const session = await requireAuth();
+  const { user } = session;
+  const result = projectSchema.safeParse(data);
+
+  if (!result.success) {
+    const { fieldErrors } = z.flattenError(result.error);
+    return {
+      success: false,
+      message: "Input validation errors in updating project",
+      errors: fieldErrors,
+    };
+  }
+
+  try {
+    await db
+      .update(projectsTable)
+      .set({ name: data.name, description: data.description })
+      .where(
+        and(eq(projectsTable.id, projectId), eq(projectsTable.userId, user.id)),
+      );
+    return { success: true, message: "Project successfully updated" };
+  } catch (err) {
+    console.error(`Error updating project with id ${projectId}`, err);
+    return { success: false, message: "Error in updating project" };
+  }
+};
+
 export type GetProjectsResults =
   | { success: true; projects: Project[] }
   | { success: false; message: string };

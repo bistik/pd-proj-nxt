@@ -10,7 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { projectSchema, type ProjectInput } from "@/lib/validations/project";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { createProject } from "@/actions/projects-actions";
+import {
+  createProject,
+  MutateProjectResult,
+  updateProject,
+} from "@/actions/projects-actions";
 import { toast } from "sonner";
 
 export default function ProjectForm({
@@ -33,7 +37,12 @@ export default function ProjectForm({
 
   const router = useRouter();
   const onSubmit = async (data: ProjectInput) => {
-    const result = await createProject(data);
+    let result: MutateProjectResult;
+    if (initialData) {
+      result = await updateProject(initialData.id, data);
+    } else {
+      result = await createProject(data);
+    }
     if (result.success) {
       toast.success(result.message);
       router.push("/projects");

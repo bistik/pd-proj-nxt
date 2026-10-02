@@ -88,6 +88,11 @@ export default function ProjectList({
                   />
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem
+                      render={
+                        <Link href={`/projects/${project.id}/edit`}>Edit</Link>
+                      }
+                    ></DropdownMenuItem>
+                    <DropdownMenuItem
                       variant="destructive"
                       onClick={() => setProjectToDelete(project)}
                     >
