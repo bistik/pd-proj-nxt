@@ -4,7 +4,8 @@ import { requireAuth } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { projectsTable, type Project } from "@/lib/db/projects-schema";
 import { ProjectInput, projectSchema } from "@/lib/validations/project";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import z from "zod";
 
 export const getProjects = async (): Promise<GetProjectsResults> => {
@@ -39,12 +40,36 @@ export const createProject = async (
       errors: fieldErrors,
     };
   }
+
   try {
     await db.insert(projectsTable).values({ ...data, userId: user.id });
     return { success: true, message: "Project successfully created" };
   } catch (err) {
     console.error("Error in creating project", err);
     return { success: false, message: "Unable to create project" };
+  }
+};
+
+export const deleteProject = async (
+  projectId: number,
+): Promise<MutateProjectResult> => {
+  const session = await requireAuth();
+  const { user } = session;
+  try {
+    const deleted = await db
+      .delete(projectsTable)
+      .where(
+        and(eq(projectsTable.id, projectId), eq(projectsTable.userId, user.id)),
+      )
+      .returning({ deletedId: projectsTable.id });
+    if (deleted.length === 0) {
+      return { success: false, message: "Project was not found" };
+    }
+    revalidatePath("/projects");
+    return { success: true, message: "Project was successfully deleted" };
+  } catch (err) {
+    console.error(`Error deleting project with id ${projectId}`, err);
+    return { success: false, message: "Unable to delete the project" };
   }
 };
 
