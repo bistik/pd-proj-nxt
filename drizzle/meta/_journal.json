@@ -29,6 +29,13 @@
       "when": 1790997001678,
       "tag": "0003_ancient_scarlet_witch",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791032085536,
+      "tag": "0004_omniscient_stellaris",
+      "breakpoints": true
     }
   ]
 }
