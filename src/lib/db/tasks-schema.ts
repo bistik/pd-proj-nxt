@@ -8,6 +8,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 import { InferSelectModel, relations } from "drizzle-orm";
+import { timeEntriesTable } from "./time-entries-schema";
 
 export const tasksTable = pgTable(
   "tasks",
@@ -28,11 +29,12 @@ export const tasksTable = pgTable(
   (table) => [index("tasks_userId_idx").on(table.userId)],
 );
 
-export const taskRelations = relations(tasksTable, ({ one }) => ({
+export const taskRelations = relations(tasksTable, ({ one, many }) => ({
   user: one(user, {
     fields: [tasksTable.userId],
     references: [user.id],
   }),
+  timeEntries: many(timeEntriesTable),
 }));
 
 export type Task = InferSelectModel<typeof tasksTable>;
