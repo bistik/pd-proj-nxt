@@ -5,6 +5,7 @@ import {
   type LucideIcon,
   FolderKanban,
   Notebook,
+  AlarmClockCheck,
 } from "lucide-react";
 
 export interface NavSubItem {
@@ -40,6 +41,15 @@ export interface NavigationConfig {
 
 export const navigationConfig: NavigationConfig = {
   navMain: [
+    {
+      title: "Tasks",
+      url: "/tasks",
+      icon: AlarmClockCheck,
+      items: [
+        { title: "new Task", url: "/tasks/new" },
+        { title: "my Tasks", url: "/tasks" },
+      ],
+    },
     {
       title: "Notes",
       url: "/notes",
