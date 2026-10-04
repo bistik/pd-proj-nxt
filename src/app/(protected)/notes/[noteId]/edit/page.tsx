@@ -1,8 +1,25 @@
 import { getNote } from "@/actions/notes-actions";
 import NoteForm from "@/components/notes/note-form";
+import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
-export default async function EditNotePage({
+export default function EditNotePage({
+  params,
+}: {
+  params: Promise<{ noteId: string }>;
+}) {
+  return (
+    <>
+      <h1 className="text-2xl font-bold">Edit Note</h1>
+      <Suspense fallback={<Loader2 className="mr-2 h-4 w-4 animate-spin" />}>
+        <EditNoteForm params={params} />
+      </Suspense>
+    </>
+  );
+}
+
+async function EditNoteForm({
   params,
 }: {
   params: Promise<{ noteId: string }>;
@@ -13,10 +30,5 @@ export default async function EditNotePage({
   if (!Number.isInteger(id)) notFound();
 
   const note = await getNote(id);
-  return (
-    <>
-      <h1 className="text-2xl font-bold">Edit Note</h1>
-      <NoteForm initialData={note} />
-    </>
-  );
+  return <NoteForm initialData={note} />;
 }
