@@ -9,6 +9,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { Timer } from "@/components/timer";
 import { getLatestTimeEntry } from "@/actions/time-entries-actions";
 import { Suspense } from "react";
+import { NavUser } from "@/components/nav-user";
+import { NavUserSkeleton } from "@/components/nav-user-skeleton";
 
 export default function ProtectedLayout({
   children,
@@ -17,12 +19,13 @@ export default function ProtectedLayout({
 }) {
   return (
     <SidebarProvider>
-      {/* quick fix, instead of export type SidebarUser = Omit<DrizzleUser, "image"> & {
-  image?: string | null
-}*/}
-      <Suspense fallback={null}>
-        <AuthenticatedSidebar />
-      </Suspense>
+      <AppSidebar
+        navUser={
+          <Suspense fallback={<NavUserSkeleton />}>
+            <AuthenticatedNavUser />
+          </Suspense>
+        }
+      />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger />
@@ -39,10 +42,10 @@ export default function ProtectedLayout({
   );
 }
 
-async function AuthenticatedSidebar() {
+async function AuthenticatedNavUser() {
   const session = await requireAuth();
   const { user } = session;
-  return <AppSidebar user={{ ...user, image: user.image ?? null }} />;
+  return <NavUser user={{ ...user, image: user.image ?? null }} />;
 }
 
 async function RunningTimer() {

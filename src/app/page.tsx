@@ -1,9 +1,16 @@
-import LogoutButton from "@/components/logout-button";
-import { Button } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { requireAuth } from "@/lib/auth-guard";
-import { Loader2 } from "lucide-react";
+import {
+  Folder,
+  ListTodo,
+  Loader2,
+  NotebookText,
+  User,
+} from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { Suspense } from "react";
+import { cn } from "cn";
 
 export default function Home() {
   return (
@@ -23,23 +30,43 @@ async function HomePageUser() {
   const session = await requireAuth();
   const { user } = session;
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <Button variant={"outline"} size={"lg"} className="cursor-pointer">
-        Hello world
-      </Button>
-      <h2>{user.name}</h2>
-      {user.image ? (
-        <Image
-          src={user.image}
-          alt="user image"
-          className="object-contain"
-          width={50}
-          height={50}
-        />
-      ) : (
-        <div className="size-50 rounded-full bg-muted" />
-      )}
-      <LogoutButton />
+    <div className="flex flex-col flex-1 items-center justify-center gap-6 bg-zinc-50 font-sans dark:bg-black">
+      <div className="flex flex-col items-center gap-2">
+        {user.image ? (
+          <Image
+            src={user.image}
+            alt="user image"
+            className="rounded-full object-cover"
+            width={64}
+            height={64}
+          />
+        ) : (
+          <div className="flex size-16 items-center justify-center rounded-full bg-muted">
+            <User className="size-8 text-muted-foreground" />
+          </div>
+        )}
+        <h2 className="text-2xl font-bold">Welcome, {user.name}</h2>
+      </div>
+      <nav className="flex items-center gap-3">
+        <Link
+          href="/tasks"
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+        >
+          <ListTodo /> Tasks
+        </Link>
+        <Link
+          href="/projects"
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+        >
+          <Folder /> Projects
+        </Link>
+        <Link
+          href="/notes"
+          className={cn(buttonVariants({ variant: "outline", size: "lg" }))}
+        >
+          <NotebookText /> Notes
+        </Link>
+      </nav>
     </div>
   );
 }
