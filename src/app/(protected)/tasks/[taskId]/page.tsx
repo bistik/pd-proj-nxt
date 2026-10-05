@@ -85,7 +85,9 @@ async function ShowTaskResult({
               <TableRow key={entry.id}>
                 <TableCell>{entry.startedAt.toLocaleString()}</TableCell>
                 <TableCell>{entry.endedAt?.toLocaleString()}</TableCell>
-                <TableCell className="text-right">{entry.duration}</TableCell>
+                <TableCell className="text-right">
+                  {entry.duration && formatDuration(entry.duration)}
+                </TableCell>
               </TableRow>
             ))}
         </TableBody>

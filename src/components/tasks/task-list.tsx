@@ -14,6 +14,8 @@ import { Button } from "../ui/button";
 import { createTimeEntry } from "@/actions/time-entries-actions";
 import { toast } from "sonner";
 import Link from "next/link";
+import { Badge } from "../ui/badge";
+import { BadgeCheckIcon } from "lucide-react";
 
 export default function TaskList({
   taskItems,
@@ -54,10 +56,15 @@ export default function TaskList({
               </Link>
             </TableCell>
             <TableCell>
-              {activeTaskId === task.id ? (
-                <p>In progress...</p>
-              ) : (
+              {activeTaskId === task.id && <p>In progress...</p>}
+              {activeTaskId !== task.id && !task.isDone && (
                 <Button onClick={() => onClickHandler(task)}>Play</Button>
+              )}
+              {activeTaskId !== task.id && task.isDone && (
+                <Badge variant={"outline"}>
+                  <BadgeCheckIcon />
+                  Done
+                </Badge>
               )}
             </TableCell>
           </TableRow>

@@ -50,6 +50,13 @@
       "when": 1791203862661,
       "tag": "0006_sloppy_slipstream",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791208844084,
+      "tag": "0007_gifted_lifeguard",
+      "breakpoints": true
     }
   ]
 }

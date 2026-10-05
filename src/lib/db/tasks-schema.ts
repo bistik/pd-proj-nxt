@@ -19,7 +19,7 @@ export const tasksTable = pgTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
-    isDone: boolean().default(false),
+    isDone: boolean("done").default(false),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
