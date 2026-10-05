@@ -4,7 +4,7 @@ import { requireAuth } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { Task, tasksTable } from "@/lib/db/tasks-schema";
 import { timeEntriesTable } from "@/lib/db/time-entries-schema";
-import { and, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { cacheLife, cacheTag, updateTag } from "next/cache";
 
 // TODO : Should we move this to a different file? DAL?
@@ -96,6 +96,30 @@ export const endTimeEntry = async (entryId: number) => {
     return { success: true, result };
   }
   return { success: false, error: "No time entry was updated" };
+};
+
+export const getTimeEntriesByTask = async (taskId: number) => {
+  const session = await requireAuth();
+  try {
+    const entries = await db
+      .select()
+      .from(timeEntriesTable)
+      .where(
+        and(
+          eq(timeEntriesTable.userId, session.user.id),
+          eq(timeEntriesTable.taskId, taskId),
+          isNotNull(timeEntriesTable.duration),
+        ),
+      );
+    const totalDuration = entries.reduce(
+      (acc, entry) => acc + (entry.duration ?? 0),
+      0,
+    );
+    return { success: true, entries, totalDuration };
+  } catch (err) {
+    console.error(`Error in fetching time entries for task ${taskId}`, err);
+    return { success: false, entries: [], totalDuration: 0 };
+  }
 };
 
 export type LatestTimeEntryResult = Awaited<

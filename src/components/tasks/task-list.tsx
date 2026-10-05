@@ -13,6 +13,7 @@ import { Task } from "@/lib/db/tasks-schema";
 import { Button } from "../ui/button";
 import { createTimeEntry } from "@/actions/time-entries-actions";
 import { toast } from "sonner";
+import Link from "next/link";
 
 export default function TaskList({
   taskItems,
@@ -22,6 +23,10 @@ export default function TaskList({
   activeTaskId: number | null;
 }) {
   const onClickHandler = async (task: Task) => {
+    if (activeTaskId) {
+      toast.error("Another task is already in progress");
+      return;
+    }
     const result = await createTimeEntry(task);
     if (!result.success) {
       toast.error(result.error);
@@ -40,7 +45,14 @@ export default function TaskList({
       <TableBody>
         {taskItems.map((task) => (
           <TableRow key={task.id}>
-            <TableCell>{task.title}</TableCell>
+            <TableCell>
+              <Link
+                href={`/tasks/${task.id}`}
+                className="underline text-blue-600 hover:text-blue-800 hover:cursor-pointer"
+              >
+                {task.title}
+              </Link>
+            </TableCell>
             <TableCell>
               {activeTaskId === task.id ? (
                 <p>In progress...</p>

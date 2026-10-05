@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { Task, tasksTable } from "@/lib/db/tasks-schema";
 import { TaskInput, taskSchema } from "@/lib/validations/task";
 import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 import z from "zod";
 
 export const createTask = async (
@@ -45,6 +46,23 @@ export const getTasks = async (): Promise<GetTasksResults> => {
     console.error("Error in fetching tasks", err);
     return { success: false, message: "Error in fetching tasks" };
   }
+};
+
+export const getTask = async (taskId: number): Promise<Task> => {
+  const session = await requireAuth();
+  const { user } = session;
+  let task: Task | undefined;
+  try {
+    task = await db.query.tasksTable.findFirst({
+      where: (tasksTable, { and, eq }) =>
+        and(eq(tasksTable.id, taskId), eq(tasksTable.userId, user.id)),
+    });
+    if (task) return task;
+  } catch (err) {
+    console.error(`Error fetching task with id ${taskId}`, err);
+    throw err;
+  }
+  notFound();
 };
 
 export type MutateTaskResult = {
