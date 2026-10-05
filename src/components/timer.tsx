@@ -7,7 +7,7 @@ import {
 import { RotateCwClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 const formatElapsed = (totalSeconds: number) => {
   const h = Math.floor(totalSeconds / 3600);
@@ -17,8 +17,17 @@ const formatElapsed = (totalSeconds: number) => {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 };
 
+const subscribeToClock = (onTick: () => void) => {
+  const id = setInterval(onTick, 1000);
+  return () => clearInterval(id);
+};
+
 export function Timer({ timeEntry }: { timeEntry: TimeEntryWithTask }) {
-  const [now, setNow] = useState<number | null>(null);
+  const nowSeconds = useSyncExternalStore(
+    subscribeToClock,
+    () => Math.floor(Date.now() / 1000),
+    () => null,
+  );
 
   const onClickStop = async (entryId: number) => {
     const result = await endTimeEntry(entryId);
@@ -29,17 +38,13 @@ export function Timer({ timeEntry }: { timeEntry: TimeEntryWithTask }) {
     }
   };
 
-  useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
   const elapsedSeconds =
-    now === null
+    nowSeconds === null
       ? null
       : Math.max(
           0,
-          Math.floor((now - timeEntry.time_entries.startedAt.getTime()) / 1000),
+          nowSeconds -
+            Math.floor(timeEntry.time_entries.startedAt.getTime() / 1000),
         );
   if (timeEntry) {
     return (
