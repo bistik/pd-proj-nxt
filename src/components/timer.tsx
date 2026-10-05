@@ -8,6 +8,7 @@ import { RotateCwClock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useSyncExternalStore } from "react";
+import { markAsDone } from "@/actions/tasks-actions";
 
 const formatElapsed = (totalSeconds: number) => {
   const h = Math.floor(totalSeconds / 3600);
@@ -35,6 +36,15 @@ export function Timer({ timeEntry }: { timeEntry: TimeEntryWithTask }) {
       toast.success("Time entry is successfully recorded");
     } else {
       toast.error(result.error);
+    }
+  };
+
+  const onClickDone = async (taskId: number, entryId: number) => {
+    const result = await markAsDone(taskId, entryId);
+    if (result.success) {
+      toast.success(result.message);
+    } else {
+      toast.error(result.message);
     }
   };
 
@@ -73,7 +83,13 @@ export function Timer({ timeEntry }: { timeEntry: TimeEntryWithTask }) {
           >
             Stop
           </Button>
-          <Button>Mark as Done</Button>
+          <Button
+            onClick={() =>
+              onClickDone(timeEntry.tasks.id, timeEntry.time_entries.id)
+            }
+          >
+            Mark as Done
+          </Button>
         </div>
       </div>
     );

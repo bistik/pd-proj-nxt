@@ -110,7 +110,8 @@ export const getTimeEntriesByTask = async (taskId: number) => {
           eq(timeEntriesTable.taskId, taskId),
           isNotNull(timeEntriesTable.duration),
         ),
-      );
+      )
+      .orderBy(desc(timeEntriesTable.createdAt));
     const totalDuration = entries.reduce(
       (acc, entry) => acc + (entry.duration ?? 0),
       0,
@@ -120,6 +121,24 @@ export const getTimeEntriesByTask = async (taskId: number) => {
     console.error(`Error in fetching time entries for task ${taskId}`, err);
     return { success: false, entries: [], totalDuration: 0 };
   }
+};
+
+export const hasActiveTimeEntry = async (taskId: number): Promise<boolean> => {
+  const session = await requireAuth();
+  try {
+    const entry = await db.query.timeEntriesTable.findFirst({
+      where: (timeEntriesTable, { and, eq }) =>
+        and(
+          eq(timeEntriesTable.taskId, taskId),
+          eq(timeEntriesTable.userId, session.user.id),
+          isNull(timeEntriesTable.endedAt),
+        ),
+    });
+    if (entry) return true;
+  } catch (err) {
+    console.error("Error in checking if task has a running entry", err);
+  }
+  return false;
 };
 
 export type LatestTimeEntryResult = Awaited<

@@ -3,8 +3,10 @@
 import { requireAuth } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { Task, tasksTable } from "@/lib/db/tasks-schema";
+import { timeEntriesTable } from "@/lib/db/time-entries-schema";
 import { TaskInput, taskSchema } from "@/lib/validations/task";
-import { eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
+import { updateTag } from "next/cache";
 import { notFound } from "next/navigation";
 import z from "zod";
 
@@ -63,6 +65,40 @@ export const getTask = async (taskId: number): Promise<Task> => {
     throw err;
   }
   notFound();
+};
+
+export const markAsDone = async (
+  taskId: number,
+  entryId: number,
+): Promise<MutateTaskResult> => {
+  const session = await requireAuth();
+  try {
+    await db.transaction(async (tx) => {
+      await tx
+        .update(timeEntriesTable)
+        .set({ endedAt: sql`now()` })
+        .where(
+          and(
+            eq(timeEntriesTable.id, entryId),
+            eq(timeEntriesTable.userId, session.user.id),
+          ),
+        );
+      await tx
+        .update(tasksTable)
+        .set({ isDone: true })
+        .where(
+          and(
+            eq(tasksTable.id, taskId),
+            eq(tasksTable.userId, session.user.id),
+          ),
+        );
+    });
+  } catch (err) {
+    console.error("Mark as done transaction error", err);
+    return { success: false, message: "Error in updating the task to done" };
+  }
+  updateTag(`timer-${session.user.id}`);
+  return { success: true, message: "Task successfully marked as done" };
 };
 
 export type MutateTaskResult = {

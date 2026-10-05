@@ -1,0 +1,1 @@
+ALTER TABLE "tasks" ADD COLUMN "isDone" boolean DEFAULT false;

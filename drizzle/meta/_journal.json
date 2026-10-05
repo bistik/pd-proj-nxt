@@ -43,6 +43,13 @@
       "when": 1791051857663,
       "tag": "0005_sleepy_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791203862661,
+      "tag": "0006_sloppy_slipstream",
+      "breakpoints": true
     }
   ]
 }

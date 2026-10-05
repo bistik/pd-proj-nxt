@@ -1,5 +1,9 @@
 import { getTask } from "@/actions/tasks-actions";
-import { getTimeEntriesByTask } from "@/actions/time-entries-actions";
+import {
+  getTimeEntriesByTask,
+  hasActiveTimeEntry,
+} from "@/actions/time-entries-actions";
+import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -11,7 +15,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatDuration } from "@/lib/utils";
-import { Loader2 } from "lucide-react";
+import { BadgeAlert, BadgeCheck, BadgeInfo, Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import z from "zod";
@@ -41,10 +45,31 @@ async function ShowTaskResult({
 
   const task = await getTask(parsed.data);
   const entries = await getTimeEntriesByTask(parsed.data);
+  const hasActiveEntry = await hasActiveTimeEntry(parsed.data);
 
   return (
     <>
-      <h2 className="text-2xl">{task.title}</h2>
+      <div className="flex items-baseline gap-2">
+        <h2 className="text-2xl tracking-tight">{task.title}</h2>
+        {task.isDone && (
+          <Badge>
+            <BadgeCheck data-icon="inline-start" />
+            Done
+          </Badge>
+        )}
+        {!task.isDone && (hasActiveEntry || entries.entries.length > 0) && (
+          <Badge>
+            <BadgeInfo data-icon="inline-start" />
+            In Progress
+          </Badge>
+        )}
+        {!task.isDone && !hasActiveEntry && entries.entries.length === 0 && (
+          <Badge>
+            <BadgeAlert data-icon="inline-start" />
+            Not Started
+          </Badge>
+        )}
+      </div>
       <Table>
         <TableCaption>Time entries</TableCaption>
         <TableHeader>
