@@ -11,6 +11,7 @@ import { cacheLife, cacheTag, updateTag } from "next/cache";
 const fetchActiveTimeEntry = async (userId: string) => {
   "use cache";
   cacheLife("minutes");
+  cacheTag(`timer-${userId}`);
   try {
     const [result] = await db
       .select()
@@ -24,9 +25,6 @@ const fetchActiveTimeEntry = async (userId: string) => {
       .innerJoin(tasksTable, eq(timeEntriesTable.taskId, tasksTable.id))
       .orderBy(desc(timeEntriesTable.createdAt))
       .limit(1);
-    if (result) {
-      cacheTag(`timer-${result.time_entries.id}`);
-    }
     return result ?? null;
   } catch (err) {
     console.error("Database error in fetching active time entry", err);
@@ -61,9 +59,6 @@ const updateEndOfTimeEntry = async (userId: string, entryId: number) => {
         ),
       )
       .returning({ updatedId: timeEntriesTable.id });
-    if (result) {
-      updateTag(`timer-${entryId}`);
-    }
     return result;
   } catch (err) {
     console.error("Database error in updating time entry", err);
@@ -88,6 +83,7 @@ export const createTimeEntry = async (task: Task) => {
   if (!timeEntry) {
     return { success: false, error: "No time entry was created" };
   }
+  updateTag(`timer-${session.user.id}`);
   return { success: true, data: timeEntry };
 };
 
@@ -95,6 +91,7 @@ export const endTimeEntry = async (entryId: number) => {
   const session = await requireAuth();
   const result = await updateEndOfTimeEntry(session.user.id, entryId);
 
+  updateTag(`timer-${session.user.id}`);
   if (result) {
     return { success: true, result };
   }

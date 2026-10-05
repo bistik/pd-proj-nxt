@@ -12,15 +12,19 @@ import {
 import { Task } from "@/lib/db/tasks-schema";
 import { Button } from "../ui/button";
 import { createTimeEntry } from "@/actions/time-entries-actions";
-import { useState } from "react";
-import { Square } from "lucide-react";
+import { toast } from "sonner";
 
-export default function TaskList({ taskItems }: { taskItems: Task[] }) {
-  const [playingTaskId, setPlayingTaskId] = useState<number | null>(null);
+export default function TaskList({
+  taskItems,
+  activeTaskId,
+}: {
+  taskItems: Task[];
+  activeTaskId: number | null;
+}) {
   const onClickHandler = async (task: Task) => {
     const result = await createTimeEntry(task);
-    if (result.success) {
-      setPlayingTaskId(task.id);
+    if (!result.success) {
+      toast.error(result.error);
     }
   };
 
@@ -38,13 +42,9 @@ export default function TaskList({ taskItems }: { taskItems: Task[] }) {
           <TableRow key={task.id}>
             <TableCell>{task.title}</TableCell>
             <TableCell>
-              {playingTaskId === task.id && (
-                <>
-                  <Square className="animate-spin w-10 h-10 text-indigo-600" />
-                  {"In progress..."}
-                </>
-              )}
-              {playingTaskId !== task.id && (
+              {activeTaskId === task.id ? (
+                <p>In progress...</p>
+              ) : (
                 <Button onClick={() => onClickHandler(task)}>Play</Button>
               )}
             </TableCell>
