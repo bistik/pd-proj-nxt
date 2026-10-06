@@ -1,13 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useId } from "react";
+import { InlineScript } from "./inline-script";
 
-export function LocalDate({ date }: { date: string | Date }) {
-  const iso = typeof date === "string" ? date : date.toISOString();
-  const [text, setText] = useState("");
+export function LocalDate({ isoDate }: { isoDate: string }) {
+  const id = useId();
 
-  useEffect(() => {
-    setText(new Date(iso).toLocaleString());
-  }, [iso]);
-  return <time dateTime={iso}>{text}</time>;
+  return (
+    <>
+      <time id={id} dateTime={isoDate} suppressHydrationWarning>
+        {new Date(isoDate).toLocaleString()}
+      </time>
+      <InlineScript
+        html={`{var n=document.getElementById("${id}");if(n)n.textContent=new Date("${isoDate}").toLocaleString()}`}
+      />
+    </>
+  );
 }

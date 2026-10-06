@@ -75,7 +75,7 @@ export function Timer({ timeEntry }: { timeEntry: TimeEntryWithTask }) {
 
         <p className="text-2xl">{timeEntry.tasks.title}</p>
         <p className="text-xl">
-          <LocalDate date={timeEntry.time_entries.startedAt} />
+          <LocalDate isoDate={timeEntry.time_entries.startedAt.toISOString()} />
         </p>
         <div className="flex gap-4 mt-4">
           <Button

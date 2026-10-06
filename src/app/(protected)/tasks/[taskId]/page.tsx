@@ -85,10 +85,14 @@ async function ShowTaskResult({
             entries.entries.map((entry) => (
               <TableRow key={entry.id}>
                 <TableCell>
-                  <LocalDate date={entry.startedAt} />
+                  <LocalDate isoDate={entry.startedAt.toISOString()} />
                 </TableCell>
                 <TableCell>
-                  {entry.endedAt ? <LocalDate date={entry.endedAt} /> : "-"}
+                  {entry.endedAt ? (
+                    <LocalDate isoDate={entry.endedAt.toISOString()} />
+                  ) : (
+                    "-"
+                  )}
                 </TableCell>
                 <TableCell className="text-right">
                   {entry.duration && formatDuration(entry.duration)}
