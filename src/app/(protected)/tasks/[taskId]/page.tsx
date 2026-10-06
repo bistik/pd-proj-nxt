@@ -3,6 +3,7 @@ import {
   getTimeEntriesByTask,
   hasActiveTimeEntry,
 } from "@/actions/time-entries-actions";
+import { LocalDate } from "@/components/local-date";
 import { Badge } from "@/components/ui/badge";
 import {
   Table,
@@ -83,8 +84,12 @@ async function ShowTaskResult({
           {entries.success &&
             entries.entries.map((entry) => (
               <TableRow key={entry.id}>
-                <TableCell>{entry.startedAt.toLocaleString()}</TableCell>
-                <TableCell>{entry.endedAt?.toLocaleString()}</TableCell>
+                <TableCell>
+                  <LocalDate date={entry.startedAt} />
+                </TableCell>
+                <TableCell>
+                  {entry.endedAt ? <LocalDate date={entry.endedAt} /> : "-"}
+                </TableCell>
                 <TableCell className="text-right">
                   {entry.duration && formatDuration(entry.duration)}
                 </TableCell>

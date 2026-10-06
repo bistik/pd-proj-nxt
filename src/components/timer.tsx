@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { useSyncExternalStore } from "react";
 import { markAsDone } from "@/actions/tasks-actions";
+import { LocalDate } from "./local-date";
 
 const formatElapsed = (totalSeconds: number) => {
   const h = Math.floor(totalSeconds / 3600);
@@ -74,7 +75,7 @@ export function Timer({ timeEntry }: { timeEntry: TimeEntryWithTask }) {
 
         <p className="text-2xl">{timeEntry.tasks.title}</p>
         <p className="text-xl">
-          {timeEntry.time_entries.startedAt.toLocaleString()}
+          <LocalDate date={timeEntry.time_entries.startedAt} />
         </p>
         <div className="flex gap-4 mt-4">
           <Button
