@@ -14,6 +14,15 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=1536
+# check=skip=SecretsUsedInArgOrEnv
+ENV DATABASE_URL="postgres://build:build@localhost:5432/build" \
+    BETTER_AUTH_SECRET="build-time-placeholder" \
+    BETTER_AUTH_URL="http://localhost:3000" \
+    GITHUB_CLIENT_ID="build-time-placeholder" \
+    GITHUB_CLIENT_SECRET="build-time-placeholder" \
+    GOOGLE_CLIENT_ID="build-time-placeholder" \
+    GOOGLE_CLIENT_SECRET="build-time-placeholder"
 RUN npm run build
 
 # --- Runner ---
@@ -23,6 +32,7 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV HOSTNAME=0.0.0.0
 ENV PORT=3000
+ENV NODE_OPTIONS=--max-old-space-size=512
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs

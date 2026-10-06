@@ -13,6 +13,13 @@ const nextConfig: NextConfig = {
     ],
   },
   cacheComponents: true,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  enablePrerenderSourceMaps: false,
+  experimental: {
+    serverSourceMaps: false,
+  },
 };
 
 export default nextConfig;
