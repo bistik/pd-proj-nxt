@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth-guard";
+import { getCurrentUser } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { Task, tasksTable } from "@/lib/db/tasks-schema";
 import { timeEntriesTable } from "@/lib/db/time-entries-schema";
@@ -67,8 +67,8 @@ const updateEndOfTimeEntry = async (userId: string, entryId: number) => {
 };
 
 export const getLatestTimeEntry = async () => {
-  const session = await requireAuth();
-  const entry = await fetchActiveTimeEntry(session.user.id);
+  const user = await getCurrentUser();
+  const entry = await fetchActiveTimeEntry(user.id);
 
   if (!entry) {
     return { success: false, error: "No running time entry found" };
@@ -77,21 +77,21 @@ export const getLatestTimeEntry = async () => {
 };
 
 export const createTimeEntry = async (task: Task) => {
-  const session = await requireAuth();
-  const timeEntry = await insertTimeEntry(session.user.id, task.id);
+  const user = await getCurrentUser();
+  const timeEntry = await insertTimeEntry(user.id, task.id);
 
   if (!timeEntry) {
     return { success: false, error: "No time entry was created" };
   }
-  updateTag(`timer-${session.user.id}`);
+  updateTag(`timer-${user.id}`);
   return { success: true, data: timeEntry };
 };
 
 export const endTimeEntry = async (entryId: number) => {
-  const session = await requireAuth();
-  const result = await updateEndOfTimeEntry(session.user.id, entryId);
+  const user = await getCurrentUser();
+  const result = await updateEndOfTimeEntry(user.id, entryId);
 
-  updateTag(`timer-${session.user.id}`);
+  updateTag(`timer-${user.id}`);
   if (result) {
     return { success: true, result };
   }
@@ -99,14 +99,14 @@ export const endTimeEntry = async (entryId: number) => {
 };
 
 export const getTimeEntriesByTask = async (taskId: number) => {
-  const session = await requireAuth();
+  const user = await getCurrentUser();
   try {
     const entries = await db
       .select()
       .from(timeEntriesTable)
       .where(
         and(
-          eq(timeEntriesTable.userId, session.user.id),
+          eq(timeEntriesTable.userId, user.id),
           eq(timeEntriesTable.taskId, taskId),
           isNotNull(timeEntriesTable.duration),
         ),
@@ -124,13 +124,13 @@ export const getTimeEntriesByTask = async (taskId: number) => {
 };
 
 export const hasActiveTimeEntry = async (taskId: number): Promise<boolean> => {
-  const session = await requireAuth();
+  const user = await getCurrentUser();
   try {
     const entry = await db.query.timeEntriesTable.findFirst({
       where: (timeEntriesTable, { and, eq }) =>
         and(
           eq(timeEntriesTable.taskId, taskId),
-          eq(timeEntriesTable.userId, session.user.id),
+          eq(timeEntriesTable.userId, user.id),
           isNull(timeEntriesTable.endedAt),
         ),
     });

@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth-guard";
+import { getCurrentUser } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { notesTable } from "@/lib/db/notes-schema";
 import { eq, and } from "drizzle-orm";
@@ -22,8 +22,7 @@ export type GetNotesResult =
 export const createNote = async (
   data: NoteInput,
 ): Promise<MutateNoteResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
 
   const result = noteSchema.safeParse(data);
 
@@ -45,8 +44,8 @@ export const createNote = async (
 };
 
 export const getNotes = async (): Promise<GetNotesResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
+
   try {
     const result = await db
       .select()
@@ -61,8 +60,8 @@ export const getNotes = async (): Promise<GetNotesResult> => {
 };
 
 export const getNote = async (noteId: number): Promise<Note> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
+
   let note: Note | undefined;
   try {
     note = await db.query.notesTable.findFirst({
@@ -81,8 +80,7 @@ export const updateNote = async (
   noteId: number,
   data: NoteInput,
 ): Promise<MutateNoteResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
 
   const result = noteSchema.safeParse(data);
 
@@ -108,8 +106,8 @@ export const updateNote = async (
 };
 
 export const deleteNote = async (noteId: number): Promise<MutateNoteResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
+
   try {
     const deleted = await db
       .delete(notesTable)

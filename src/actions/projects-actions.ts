@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth-guard";
+import { getCurrentUser } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { projectsTable, type Project } from "@/lib/db/projects-schema";
 import { ProjectInput, projectSchema } from "@/lib/validations/project";
@@ -10,8 +10,7 @@ import { notFound } from "next/navigation";
 import z from "zod";
 
 export const getProjects = async (): Promise<GetProjectsResults> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
 
   try {
     const result = await db
@@ -29,8 +28,7 @@ export const getProjects = async (): Promise<GetProjectsResults> => {
 export const createProject = async (
   data: ProjectInput,
 ): Promise<MutateProjectResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   const result = projectSchema.safeParse(data);
 
   if (!result.success) {
@@ -54,8 +52,7 @@ export const createProject = async (
 export const deleteProject = async (
   projectId: number,
 ): Promise<MutateProjectResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   try {
     const deleted = await db
       .delete(projectsTable)
@@ -75,8 +72,7 @@ export const deleteProject = async (
 };
 
 export const getProject = async (projectId: number): Promise<Project> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   let project: Project | undefined;
   try {
     project = await db.query.projectsTable.findFirst({
@@ -95,8 +91,7 @@ export const updateProject = async (
   projectId: number,
   data: ProjectInput,
 ): Promise<MutateProjectResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   const result = projectSchema.safeParse(data);
 
   if (!result.success) {

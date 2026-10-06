@@ -17,4 +17,5 @@ export const db = drizzle({
     ...taskSchema,
     ...timeEntrySchema,
   },
+  logger: process.env.NODE_ENV === "development",
 });

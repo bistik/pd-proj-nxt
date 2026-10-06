@@ -1,6 +1,6 @@
 "use server";
 
-import { requireAuth } from "@/lib/auth-guard";
+import { getCurrentUser } from "@/lib/auth-guard";
 import { db } from "@/lib/db";
 import { Task, tasksTable } from "@/lib/db/tasks-schema";
 import { timeEntriesTable } from "@/lib/db/time-entries-schema";
@@ -13,8 +13,7 @@ import z from "zod";
 export const createTask = async (
   data: TaskInput,
 ): Promise<MutateTaskResult> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   const result = taskSchema.safeParse(data);
   if (!result.success) {
     const { fieldErrors } = z.flattenError(result.error);
@@ -34,8 +33,7 @@ export const createTask = async (
 };
 
 export const getTasks = async (): Promise<GetTasksResults> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
 
   try {
     const tasks = await db
@@ -51,8 +49,7 @@ export const getTasks = async (): Promise<GetTasksResults> => {
 };
 
 export const getTask = async (taskId: number): Promise<Task> => {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   let task: Task | undefined;
   try {
     task = await db.query.tasksTable.findFirst({
@@ -71,7 +68,7 @@ export const markAsDone = async (
   taskId: number,
   entryId: number,
 ): Promise<MutateTaskResult> => {
-  const session = await requireAuth();
+  const user = await getCurrentUser();
   try {
     await db.transaction(async (tx) => {
       await tx
@@ -80,24 +77,19 @@ export const markAsDone = async (
         .where(
           and(
             eq(timeEntriesTable.id, entryId),
-            eq(timeEntriesTable.userId, session.user.id),
+            eq(timeEntriesTable.userId, user.id),
           ),
         );
       await tx
         .update(tasksTable)
         .set({ isDone: true })
-        .where(
-          and(
-            eq(tasksTable.id, taskId),
-            eq(tasksTable.userId, session.user.id),
-          ),
-        );
+        .where(and(eq(tasksTable.id, taskId), eq(tasksTable.userId, user.id)));
     });
   } catch (err) {
     console.error("Mark as done transaction error", err);
     return { success: false, message: "Error in updating the task to done" };
   }
-  updateTag(`timer-${session.user.id}`);
+  updateTag(`timer-${user.id}`);
   return { success: true, message: "Task successfully marked as done" };
 };
 

@@ -1,8 +1,12 @@
+import "server-only";
+
 import { headers } from "next/headers";
 import { auth } from "./auth";
 import { redirect } from "next/navigation";
 
-export async function requireAuth() {
+export async function getCurrentUser() {
+  "use cache: private";
+
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -11,7 +15,7 @@ export async function requireAuth() {
     redirect("/login");
   }
 
-  return session;
+  return session.user;
 }
 
 export async function requireNoAuth() {

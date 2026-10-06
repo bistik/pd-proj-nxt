@@ -1,12 +1,6 @@
 import { buttonVariants } from "@/components/ui/button";
-import { requireAuth } from "@/lib/auth-guard";
-import {
-  Folder,
-  ListTodo,
-  Loader2,
-  NotebookText,
-  User,
-} from "lucide-react";
+import { getCurrentUser } from "@/lib/auth-guard";
+import { Folder, ListTodo, Loader2, NotebookText, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -27,8 +21,7 @@ export default function Home() {
 }
 
 async function HomePageUser() {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   return (
     <div className="flex flex-col flex-1 items-center justify-center gap-6 bg-zinc-50 font-sans dark:bg-black">
       <div className="flex flex-col items-center gap-2">

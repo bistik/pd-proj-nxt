@@ -4,7 +4,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { requireAuth } from "@/lib/auth-guard";
+import { getCurrentUser } from "@/lib/auth-guard";
 import { Toaster } from "@/components/ui/sonner";
 import { Timer } from "@/components/timer";
 import { getLatestTimeEntry } from "@/actions/time-entries-actions";
@@ -43,8 +43,7 @@ export default function ProtectedLayout({
 }
 
 async function AuthenticatedNavUser() {
-  const session = await requireAuth();
-  const { user } = session;
+  const user = await getCurrentUser();
   return <NavUser user={{ ...user, image: user.image ?? null }} />;
 }
 
