@@ -11,6 +11,7 @@ import { getLatestTimeEntry } from "@/actions/time-entries-actions";
 import { Suspense } from "react";
 import { NavUser } from "@/components/nav-user";
 import { NavUserSkeleton } from "@/components/nav-user-skeleton";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export default function ProtectedLayout({
   children,
@@ -29,6 +30,9 @@ export default function ProtectedLayout({
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger />
+          <div className="ml-auto">
+            <ModeToggle />
+          </div>
         </header>
         <main className="flex-1 p-6">
           <Suspense fallback={null}>

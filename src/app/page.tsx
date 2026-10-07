@@ -23,7 +23,7 @@ export default function Home() {
 async function HomePageUser() {
   const user = await getCurrentUser();
   return (
-    <div className="flex flex-col flex-1 items-center justify-center gap-6 bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex flex-col flex-1 items-center justify-center gap-6 bg-background text-foreground font-sans">
       <div className="flex flex-col items-center gap-2">
         {user.image ? (
           <Image
