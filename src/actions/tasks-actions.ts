@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import { Task, tasksTable } from "@/lib/db/tasks-schema";
 import { timeEntriesTable } from "@/lib/db/time-entries-schema";
 import { TaskInput, taskSchema } from "@/lib/validations/task";
-import { and, eq, sql } from "drizzle-orm";
+import { and, asc, eq, getTableColumns, sql } from "drizzle-orm";
 import { updateTag } from "next/cache";
 import { notFound } from "next/navigation";
 import z from "zod";
@@ -36,10 +36,27 @@ export const getTasks = async (): Promise<GetTasksResults> => {
   const user = await getCurrentUser();
 
   try {
+    const latestTimeEntry = db
+      .select({
+        taskId: timeEntriesTable.taskId,
+        lastStartedAt: sql`max(${timeEntriesTable.startedAt})`.as(
+          "last_started_at",
+        ),
+      })
+      .from(timeEntriesTable)
+      .where(eq(timeEntriesTable.userId, user.id))
+      .groupBy(timeEntriesTable.taskId)
+      .as("latest_time_entry");
+
     const tasks = await db
-      .select()
+      .select(getTableColumns(tasksTable))
       .from(tasksTable)
+      .leftJoin(latestTimeEntry, eq(latestTimeEntry.taskId, tasksTable.id))
       .where(eq(tasksTable.userId, user.id))
+      .orderBy(
+        asc(tasksTable.isDone),
+        sql`${latestTimeEntry.lastStartedAt} desc nulls last`,
+      )
       .limit(50);
     return { success: true, tasks };
   } catch (err) {
